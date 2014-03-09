@@ -1,7 +1,7 @@
 package server;
 
 public class MainServer {
-	
+//
 //	private static Player players[] = new  Player[21];
 //	private static int startIndex = 0;
 //	private static int endIndex = -1;
@@ -40,12 +40,30 @@ public class MainServer {
 	private static Player[] slot2 = new  Player[3];
 	private static Player[] slot3 = new  Player[3];
 	private static Player[] slot4 = new  Player[3];
-	private static int startIndex = 0;
-	private static int endIndex = -1;
-	private static int numberOfPlayers = 0;
 	
+	/**
+	 * Method adds new player to first free slot.
+	 * @param userName 
+	 * @param ipAddress
+	 * @param port
+	 * @return boolean
+	 */
 	public static synchronized boolean addNewPlayer(String userName, String ipAddress, int port) {
 		
+		int playerAddedToSlot = addPlayerToSlot(userName, ipAddress, port);
+		if(playerAddedToSlot!=-1) return true;
+		return false;
+	}
+	
+	
+	/**
+	 * Method adds new player to first free slot.
+	 * @param userName 
+	 * @param ipAddress
+	 * @param port
+	 * @return number that represents slot or -1 if there is no free spot in slots.
+	 */
+	public static int addPlayerToSlot(String userName, String ipAddress, int port) {
 		if(slot1.length<3) {
 			for (Player p : slot1) {
 				if(p==null) {
@@ -53,11 +71,10 @@ public class MainServer {
 					if(slot1.length==3) {
 						// startGame(slot1)
 					}
-					return true;
+					return 1;
 				}
 			}
 		}
-
 		if(slot2.length<3) {
 			for (Player p : slot2) {
 				if(p==null) {
@@ -65,7 +82,7 @@ public class MainServer {
 					if(slot1.length==3) {
 						// startGame(slot1)
 					}
-					return true;
+					return 2;
 				}
 			}
 		}
@@ -77,7 +94,7 @@ public class MainServer {
 					if(slot1.length==3) {
 						// startGame(slot1)
 					}
-					return true;
+					return 3;
 				}
 			}
 		}
@@ -89,13 +106,15 @@ public class MainServer {
 					if(slot1.length==3) {
 						// startGame(slot1)
 					}
-					return true;
+					return 4;
 				}
 			}
 		}
-		
-		return false;
+		return -1;
 	}
+	
+	
+	
 	// int indeks slota
 	public static synchronized int startGame(Player[] slot) {
 		return 0;
