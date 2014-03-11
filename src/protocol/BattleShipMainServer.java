@@ -2,11 +2,11 @@ package protocol;
 
 public class BattleShipMainServer {
 
-	private static final int INIT = 0;
-	private static final int SEARCH = 1;
-	private static final int ERROR = 2;
-	private static final int START = 3;
-	private static final int BYE = 4; 
+	public static final int INIT = 0;
+	public static final int SEARCH = 1;
+	public static final int ERROR = 2;
+	public static final int START = 3;
+	public static final int BYE = 4; 
 	
 	
 	private int state;

@@ -36,10 +36,10 @@ public class MainServer {
 //		
 //	}
 
-	private static Player[] slot1 = new  Player[3];
-	private static Player[] slot2 = new  Player[3];
-	private static Player[] slot3 = new  Player[3];
-	private static Player[] slot4 = new  Player[3];
+	private static PlayerThread[] slot1 = new  PlayerThread[3];
+	private static PlayerThread[] slot2 = new  PlayerThread[3];
+	private static PlayerThread[] slot3 = new  PlayerThread[3];
+	private static PlayerThread[] slot4 = new  PlayerThread[3];
 	
 	/**
 	 * Method adds new player to first free slot.
@@ -48,9 +48,9 @@ public class MainServer {
 	 * @param port
 	 * @return boolean
 	 */
-	public static synchronized boolean addNewPlayer(String userName, String ipAddress, int port) {
+	public static synchronized boolean addNewPlayer(PlayerThread player) {
 		
-		int playerAddedToSlot = addPlayerToSlot(userName, ipAddress, port);
+		int playerAddedToSlot = addPlayerToSlot(player);
 		if(playerAddedToSlot!=-1) return true;
 		return false;
 	}
@@ -63,11 +63,11 @@ public class MainServer {
 	 * @param port
 	 * @return number that represents slot or -1 if there is no free spot in slots.
 	 */
-	public static int addPlayerToSlot(String userName, String ipAddress, int port) {
+	public static int addPlayerToSlot(PlayerThread player) {
 		if(slot1.length<3) {
-			for (Player p : slot1) {
+			for (PlayerThread p : slot1) {
 				if(p==null) {
-					p = new Player(userName, ipAddress, port);
+					p = player;
 					if(slot1.length==3) {
 						// startGame(slot1)
 					}
@@ -76,9 +76,9 @@ public class MainServer {
 			}
 		}
 		if(slot2.length<3) {
-			for (Player p : slot2) {
+			for (PlayerThread p : slot2) {
 				if(p==null) {
-					p = new Player(userName, ipAddress, port);
+					p = player;
 					if(slot1.length==3) {
 						// startGame(slot1)
 					}
@@ -88,9 +88,9 @@ public class MainServer {
 		}
 
 		if(slot3.length<3) {
-			for (Player p : slot3) {
+			for (PlayerThread p : slot3) {
 				if(p==null) {
-					p = new Player(userName, ipAddress, port);
+					p = player;
 					if(slot1.length==3) {
 						// startGame(slot1)
 					}
@@ -100,9 +100,9 @@ public class MainServer {
 		}
 
 		if(slot4.length<3) {
-			for (Player p : slot4) {
+			for (PlayerThread p : slot4) {
 				if(p==null) {
-					p = new Player(userName, ipAddress, port);
+					p = player;
 					if(slot1.length==3) {
 						// startGame(slot1)
 					}
@@ -116,8 +116,34 @@ public class MainServer {
 	
 	
 	// int indeks slota
-	public static synchronized int startGame(Player[] slot) {
-		return 0;
+	public static synchronized void startGame(PlayerThread[] slot) {
+		for(int i=0; i<slot.length; i++) {
+			
+			switch (i) {
+				case 0: {
+					slot[i].peersFound(slot[1].getIpAddress(), slot[1].getPort(), slot[2].getIpAddress(), slot[2].getPort());
+				}
+				break;
+				
+				case 1: {
+					slot[i].peersFound(slot[0].getIpAddress(), slot[0].getPort(), slot[2].getIpAddress(), slot[2].getPort());
+				}
+				break;
+				
+				case 2: {
+					slot[i].peersFound(slot[0].getIpAddress(), slot[0].getPort(), slot[1].getIpAddress(), slot[1].getPort());
+				}
+				break;
+			}
+			
+		}
+		
+	}
+	
+	public void emptySlot(PlayerThread[] slot) {
+		for(int i=0; i<slot.length; i++) {
+			slot[i] = null;
+		}
 	}
 	
 	public static void main(String[] args) {
