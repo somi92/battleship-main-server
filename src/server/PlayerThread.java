@@ -132,9 +132,4 @@ public class PlayerThread implements Runnable {
 		}
 	}
 	
-	public void emptySlot(PlayerThread[] slot) {
-		for(int i=0; i<slot.length; i++) {
-			slot[i] = null;
-		}
-	}
 }
