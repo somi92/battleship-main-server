@@ -93,6 +93,7 @@ public class PlayerThread implements Runnable {
 					case BattleShipMainServer.SEARCH: {
 						setUserName(protocol.getUserName());
 						slotFilled = MainServer.addNewPlayer(this);
+						System.out.println(slotFilled);
 						if(!slotFilled) {
 							response = protocol.responseMessage();
 						}
@@ -117,8 +118,8 @@ public class PlayerThread implements Runnable {
 				
 				if(!slotFilled) {
 					outputToClient.writeBytes(response);
+					System.out.println("Response sent to CLIENT: "+toString()+" : "+response);
 				}
-				System.out.println("Response sent to CLIENT: "+toString()+" : "+response);
 			}
 			
 			inputFromClient.close();

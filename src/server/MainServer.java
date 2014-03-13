@@ -5,84 +5,37 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class MainServer {
-//
-//	private static Player players[] = new  Player[21];
-//	private static int startIndex = 0;
-//	private static int endIndex = -1;
-//	private static int numberOfPlayers = 0;
-//	
-//	public static synchronized boolean addNewPlayer(String userName, String ipAddress, int port) {
-//		if(numberOfPlayers==players.length) {
-//			return false;
-//		}
-//		if(endIndex == 20) {
-//			endIndex = 0;
-//		} 
-//		Player newPlayer = new Player(userName, ipAddress, port);
-//		players[++endIndex] = newPlayer;
-//		numberOfPlayers++;
-//		return true;
-//	}
-//	
-//	public static synchronized void removePlayer() {
-//		if(numberOfPlayers==0) {
-//			return;
-//		}
-//		if(startIndex==20) {
-//			startIndex = 0;
-//		} else {
-//			startIndex++;
-//		}
-//		numberOfPlayers--;
-//	}
-//	
-//	public static synchronized boolean isThereEnoughPlayers() {
-//		
-//	}
 
 	private static volatile PlayerThread[] slot1 = new  PlayerThread[3];
 	private static volatile PlayerThread[] slot2 = new  PlayerThread[3];
 	private static volatile PlayerThread[] slot3 = new  PlayerThread[3];
 	private static volatile PlayerThread[] slot4 = new  PlayerThread[3];
+	private static volatile int[] elementsNumber = new int[4];
 	
-	private static volatile int slot1Elements = 0;
-	private static volatile int slot2Elements = 0;
-	private static volatile int slot3Elements = 0;
-	private static volatile int slot4Elements = 0;
+	static {
+		for(int i=0; i<elementsNumber.length; i++) {
+			elementsNumber[i] = 0;
+		}
+	}
 	
-	/**
-	 * Method adds new player to first free slot.
-	 * @param userName 
-	 * @param ipAddress
-	 * @param port
-	 * @return boolean
-	 */
 	public static synchronized boolean addNewPlayer(PlayerThread player) {
 		int playerAddedToSlot = addPlayerToSlot(player);
 		if(playerAddedToSlot==0) {
-			System.out.println("Slot filled, notifying peers...");
+//			System.out.println("Slot filled, notifying peers...");
 			return true;
 		}
 		return false;
 	}
 	
-	
-	/**
-	 * Method adds new player to first free slot.
-	 * @param userName 
-	 * @param ipAddress
-	 * @param port
-	 * @return number that represents slot or -1 if there is no free spot in slots.
-	 */
 	private static synchronized int addPlayerToSlot(PlayerThread player) {
-		if(slot1Elements<3) {
+		if(elementsNumber[0]<3) {
 			for(int i=0; i<slot1.length; i++) {
 				if(slot1[i]==null) {
 					slot1[i] = player;
-					slot1Elements++;
+					elementsNumber[0]++;
 					System.out.println("New player added to slot 1: "+player);
-					if(slot1Elements==3) {
-						startGame(slot1);
+					if(elementsNumber[0]==3) {
+						startGame(slot1,0);
 						return 0;
 					}
 					return 1;
@@ -90,14 +43,14 @@ public class MainServer {
 			}
 		}
 		
-		if(slot2Elements<3) {
+		if(elementsNumber[1]<3) {
 			for(int i=0; i<slot2.length; i++) {
 				if(slot2[i]==null) {
 					slot2[i] = player;
-					slot2Elements++;
+					elementsNumber[1]++;
 					System.out.println("New player added to slot 2: "+player);
-					if(slot2Elements==3) {
-						startGame(slot2);
+					if(elementsNumber[1]==3) {
+						startGame(slot2,1);
 						return 0;
 					}
 					return 1;
@@ -105,14 +58,14 @@ public class MainServer {
 			}
 		}
 
-		if(slot3Elements<3) {
+		if(elementsNumber[2]<3) {
 			for(int i=0; i<slot3.length; i++) {
 				if(slot3[i]==null) {
 					slot3[i] = player;
-					slot3Elements++;
+					elementsNumber[2]++;
 					System.out.println("New player added to slot 3: "+player);
-					if(slot3Elements==3) {
-						startGame(slot3);
+					if(elementsNumber[2]==3) {
+						startGame(slot3,2);
 						return 0;
 					}
 					return 1;
@@ -120,14 +73,14 @@ public class MainServer {
 			}
 		}
 
-		if(slot4Elements<3) {
+		if(elementsNumber[3]<3) {
 			for(int i=0; i<slot4.length; i++) {
 				if(slot4[i]==null) {
 					slot4[i] = player;
-					slot4Elements++;
+					elementsNumber[3]++;
 					System.out.println("New player added to slot 4: "+player);
-					if(slot4Elements==3) {
-						startGame(slot4);
+					if(elementsNumber[3]==3) {
+						startGame(slot4,3);
 						return 0;
 					}
 					return 1;
@@ -139,7 +92,7 @@ public class MainServer {
 	}
 	
 	
-	private static synchronized void startGame(PlayerThread[] slot) {
+	private static synchronized void startGame(PlayerThread[] slot, int slotID) {
 		for(int i=0; i<slot.length; i++) {
 			
 			switch (i) {
@@ -161,14 +114,16 @@ public class MainServer {
 		}
 //		System.out.println("Slot filled, notifying peers...");
 //		displaySlot(slot);
-//		emptySlot(slot);
+		emptySlot(slot, slotID);
 		
 	}
 	
-	private static synchronized void emptySlot(PlayerThread[] slot) {
+	private static synchronized void emptySlot(PlayerThread[] slot, int slotID) {
 		for(int i=0; i<slot.length; i++) {
 			slot[i] = null;
 		}
+		elementsNumber[slotID]=0;
+		displaySlot(slot);
 	}
 	
 	private static synchronized void displaySlot(PlayerThread[] slot) {
