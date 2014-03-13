@@ -20,7 +20,8 @@ public class PlayerThread implements Runnable {
 	private BattleShipMainServer protocol;
 	
 	private boolean connectionTerminated;
-	private boolean addedToSlot;
+	private boolean slotFilled;
+//	private boolean addedToSlot;
 	
 	public PlayerThread() {
 		
@@ -29,7 +30,8 @@ public class PlayerThread implements Runnable {
 	public PlayerThread(Socket communicationSocket) {
 		this.communicationSocket = communicationSocket;
 		this.connectionTerminated = false;
-		this.addedToSlot = false;
+		this.slotFilled = false;
+//		this.addedToSlot = false;
 	}
 	
 //	public PlayerThread(String userName, String ipAddress, int port) {
@@ -39,6 +41,9 @@ public class PlayerThread implements Runnable {
 //	}
 	
 	public String getUserName() {
+		if(this.userName==null) {
+			return "";
+		}
 		return userName;
 	}
 	public void setUserName(String userName) {
@@ -68,6 +73,7 @@ public class PlayerThread implements Runnable {
 			
 			setIpAddress(this.communicationSocket.getInetAddress().toString());
 			setPort(this.communicationSocket.getPort());
+			setUserName("");
 			
 			protocol = new BattleShipMainServer();
 			
@@ -78,17 +84,18 @@ public class PlayerThread implements Runnable {
 				
 				clientMessage = inputFromClient.readLine();
 				
-				System.out.println("Received message from client "+getIpAddress()+":"+getPort()+" : "+clientMessage);
+				System.out.println("Received message from client "+toString()+" : "+clientMessage);
 				int responseCode = protocol.parseProtocolMessage(clientMessage);
 				response = "";
 				
 				switch(responseCode) {
 				
 					case BattleShipMainServer.SEARCH: {
-						if(!this.addedToSlot) {
-							this.addedToSlot = MainServer.addNewPlayer(this);
+						setUserName(protocol.getUserName());
+						slotFilled = MainServer.addNewPlayer(this);
+						if(!slotFilled) {
+							response = protocol.responseMessage();
 						}
-						response = protocol.responseMessage();
 					}
 					break;
 					
@@ -108,8 +115,10 @@ public class PlayerThread implements Runnable {
 					}
 				}
 				
-				outputToClient.writeBytes(response);
-				System.out.println("Response sent to client "+getIpAddress()+":"+getPort()+" : "+response);
+				if(!slotFilled) {
+					outputToClient.writeBytes(response);
+				}
+				System.out.println("Response sent to CLIENT: "+toString()+" : "+response);
 			}
 			
 			inputFromClient.close();
@@ -125,11 +134,21 @@ public class PlayerThread implements Runnable {
 	
 	public void peersFound(String IP1, int port1, String IP2, int port2) {
 		try {
-			this.outputToClient.writeBytes(protocol.responseMessage(IP1, port1+"", IP2, port2+""));
+			String message = protocol.responseMessage(IP1, port1+"", IP2, port2+"");
+			this.outputToClient.writeBytes(message);
+			System.out.println("Response sent to client: "+toString()+" : "+message);
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public String toString() {
+//		if(getUserName().equals("")) {
+//			return getIpAddress()+":"+getPort();
+//		}
+		return getUserName()+" "+getIpAddress()+":"+getPort();
 	}
 	
 }

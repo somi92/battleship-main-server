@@ -108,18 +108,18 @@ public class BattleShipMainServer {
 	public String responseMessage(){
 
 		if(getState() == BattleShipMainServer.SEARCH) {
-			return "WAIT";
+			return "WAIT"+'\n';
 		}
 		if(getState() == BattleShipMainServer.BYE) {
-			return "BYE";
+			return "BYE"+'\n';
 		}
-		return "ERROR";
+		return "ERROR"+'\n';
 	}
 	
 	public String responseMessage(String IP1, String port1, String IP2, String port2){
 	
 		
-		setState(BattleShipMainServer.START);
+//		setState(BattleShipMainServer.START);
 		return "PEERS_"+IP1+":"+port1+"_"+IP2+":"+port2+'\n';
 	
 	}
