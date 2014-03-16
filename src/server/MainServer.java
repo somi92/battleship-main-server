@@ -19,16 +19,17 @@ public class MainServer {
 	}
 	
 	public static synchronized boolean addNewPlayer(PlayerThread player) {
-		int playerAddedToSlot = addPlayerToSlot(player);
+		int slotID = nextSlot();
+		int playerAddedToSlot = addPlayerToSlot(player, slotID);
 		if(playerAddedToSlot==0) {
-//			System.out.println("Slot filled, notifying peers...");
 			return true;
 		}
 		return false;
 	}
 	
-	private static synchronized int addPlayerToSlot(PlayerThread player) {
-		if(elementsNumber[0]<3) {
+	private static synchronized int addPlayerToSlot(PlayerThread player, int slotID) {
+		
+		if(slotID == 0) {
 			for(int i=0; i<slot1.length; i++) {
 				if(slot1[i]==null) {
 					slot1[i] = player;
@@ -43,7 +44,7 @@ public class MainServer {
 			}
 		}
 		
-		if(elementsNumber[1]<3) {
+		if(slotID == 1) {
 			for(int i=0; i<slot2.length; i++) {
 				if(slot2[i]==null) {
 					slot2[i] = player;
@@ -58,7 +59,7 @@ public class MainServer {
 			}
 		}
 
-		if(elementsNumber[2]<3) {
+		if(slotID == 2) {
 			for(int i=0; i<slot3.length; i++) {
 				if(slot3[i]==null) {
 					slot3[i] = player;
@@ -73,7 +74,7 @@ public class MainServer {
 			}
 		}
 
-		if(elementsNumber[3]<3) {
+		if(slotID == 3) {
 			for(int i=0; i<slot4.length; i++) {
 				if(slot4[i]==null) {
 					slot4[i] = player;
@@ -91,8 +92,20 @@ public class MainServer {
 		return -1;
 	}
 	
+	private static synchronized int nextSlot() {
+		int slotID = 0;
+		int max = 0;
+		for(int i=0; i<elementsNumber.length; i++) {
+			if(elementsNumber[i] > max && elementsNumber[i]<3) {
+				max = elementsNumber[i];
+				slotID = i;
+			}
+		}
+		return slotID;
+	}
 	
 	private static synchronized void startGame(PlayerThread[] slot, int slotID) {
+		System.out.println("Slot filled, notifying peers...");
 		for(int i=0; i<slot.length; i++) {
 			
 			switch (i) {
@@ -112,7 +125,6 @@ public class MainServer {
 				break;
 			}
 		}
-//		System.out.println("Slot filled, notifying peers...");
 //		displaySlot(slot);
 		emptySlot(slot, slotID);
 		

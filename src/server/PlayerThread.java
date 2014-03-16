@@ -93,7 +93,6 @@ public class PlayerThread implements Runnable {
 					case BattleShipMainServer.SEARCH: {
 						setUserName(protocol.getUserName());
 						slotFilled = MainServer.addNewPlayer(this);
-						System.out.println(slotFilled);
 						if(!slotFilled) {
 							response = protocol.responseMessage();
 						}
@@ -111,12 +110,18 @@ public class PlayerThread implements Runnable {
 					}
 					break;
 					
+					case -1: {
+						this.connectionTerminated = true;
+						System.out.println("Player "+toString()+" disconnected!");
+						return;
+					}
+					
 					default: {
 						response = protocol.responseMessage();
 					}
 				}
 				
-				if(!slotFilled) {
+				if(!slotFilled && this.connectionTerminated==false) {
 					outputToClient.writeBytes(response);
 					System.out.println("Response sent to CLIENT: "+toString()+" : "+response);
 				}

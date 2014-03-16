@@ -64,6 +64,10 @@ public class BattleShipMainServer {
 	// pick the state
 	public int parseProtocolMessage(String message) {
 		
+		if(message == null) {
+			return -1;
+		}
+		
 		String[] messageParts = message.split("_");
 		
 		if(messageParts.length==1) {
