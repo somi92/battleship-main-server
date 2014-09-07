@@ -71,10 +71,6 @@ public class PlayerThread implements Runnable {
 			String clientMessage;
 			String response;
 			
-			setIpAddress(this.communicationSocket.getInetAddress().toString());
-			setPort(this.communicationSocket.getPort());
-			setUserName("");
-			
 			protocol = new BattleShipMainServer();
 			
 			inputFromClient = new BufferedReader(new InputStreamReader(this.communicationSocket.getInputStream()));
@@ -87,6 +83,10 @@ public class PlayerThread implements Runnable {
 				System.out.println("Received message from client "+toString()+" : "+clientMessage);
 				int responseCode = protocol.parseProtocolMessage(clientMessage);
 				response = "";
+				
+				setIpAddress(this.communicationSocket.getInetAddress().getHostAddress());
+				setPort(protocol.getPort());
+				setUserName(protocol.getUserName());
 				
 				switch(responseCode) {
 				
